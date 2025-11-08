@@ -1,0 +1,65 @@
+{
+  "projectName": "Mindly - Módulo Bônus Pro",
+  "objective_prompt": "Projetar uma nova seção exclusiva 'Trilhas Mindly Pro' dentro do web app, oferecendo experiências imersivas de autodesenvolvimento com meditações guiadas, sons premium e jornadas de equilíbrio mental. Essa área deve transmitir exclusividade, propósito e bem-estar contínuo.",
+  "designSystem": {
+    "instruction": "Manter o design system principal (cores e tipografia), adicionando um toque visual de exclusividade. Utilizar elementos em dourado claro (#FBBF24) e gradientes sutis para indicar o status Pro. Ícones de estrela, coroa ou diamante 💎 podem marcar os conteúdos premium.",
+    "aesthetic": "Inspirador, sereno e de alto valor percebido."
+  },
+  "userFlowIntegration": {
+    "entryPoint": "Na Homepage do usuário logado com plano Pro, incluir um novo card grande com destaque visual chamado 'Área Bônus Pro: Trilhas de Transformação 💎'. Este card deve conter uma breve descrição: 'Desafios e experiências guiadas para evoluir mente, foco e equilíbrio'."
+  },
+  "newPagesAndComponents": [
+    {
+      "pageName": "Página de Bônus Pro (Landing)",
+      "description": "Página central das Trilhas Mindly Pro, funcionando como um hub premium. Deve gerar sensação de conquista e progresso pessoal.",
+      "layout": [
+        "Header principal com o título: 'Bem-vindo(a) à sua Jornada Mindly Pro 💎'",
+        "Texto introdutório: 'Aqui você encontra trilhas exclusivas para desenvolver autoconhecimento, foco e serenidade. Cada jornada é um passo em direção à sua melhor versão.'",
+        "Três grandes cards de navegação, um para cada trilha:",
+        "1️⃣ '21 Dias de Foco e Clareza Mental' – melhora a produtividade consciente.",
+        "2️⃣ '7 Dias de Paz Interior' – combate o estresse e fortalece o equilíbrio emocional.",
+        "3️⃣ 'Desafio Sono Perfeito' – guia para melhorar a qualidade do sono e o relaxamento profundo."
+      ]
+    },
+    {
+      "componentName": "Template de Página de Trilha",
+      "description": "Estrutura padrão para todas as trilhas de transformação, garantindo consistência visual e imersão emocional.",
+      "layout": [
+        "Header com o título da trilha e um selo 'Pro 💎'.",
+        "Bloco introdutório com texto motivacional e botão 'Iniciar Jornada'.",
+        "Lista (ou timeline) de etapas diárias: 'Dia 1 – Meditação Inicial', 'Dia 2 – Journaling Guiado', etc.",
+        "Cada etapa contém: ícone, título, tempo estimado, tipo de atividade (áudio, texto, respiração).",
+        "Ao clicar, abre-se um modal com o conteúdo completo da atividade, incluindo player de áudio, instruções e insight da IA emocional."
+      ]
+    },
+    {
+      "pageName": "Trilha: 21 Dias de Foco e Clareza Mental",
+      "inherits": "Template de Página de Trilha",
+      "content": "Exemplos de etapas: Dia 1 – Respiração de Clareza (5min), Dia 2 – Visualização de Objetivos, Dia 3 – Técnica Pomodoro Mindful, Dia 7 – Revisão de Hábitos, Dia 14 – Reprogramação Mental Positiva, Dia 21 – Reflexão Final com IA."
+    },
+    {
+      "pageName": "Trilha: 7 Dias de Paz Interior",
+      "inherits": "Template de Página de Trilha",
+      "content": "Exemplos de etapas: Dia 1 – Meditação da Gratidão, Dia 2 – Respiração 4-7-8, Dia 3 – Diário de Emoções, Dia 5 – Soltar o Controle, Dia 7 – Autoaceitação e Calma Profunda."
+    },
+    {
+      "pageName": "Trilha: Desafio Sono Perfeito",
+      "inherits": "Template de Página de Trilha",
+      "content": "Exemplos de etapas: Dia 1 – Preparação Noturna (Luz e Som), Dia 2 – Meditação de Relaxamento, Dia 4 – Sons Binaurais Premium, Dia 6 – Journaling do Sono, Dia 7 – Ritual de Desconexão."
+    },
+    {
+      "componentName": "Módulo de Sons Premium",
+      "description": "Biblioteca de sons exclusiva para assinantes Pro, com faixas de alta qualidade em áudio 3D.",
+      "layout": [
+        "Header: 'Sons Mindly Premium 🎧'",
+        "Categorias: 'Chuva e Natureza', 'Ruído Branco', 'Foco Profundo', 'Sono Restaurador'.",
+        "Cada faixa com player minimalista, botão de curtida e opção de download (para uso offline)."
+      ]
+    },
+    {
+      "componentName": "Modal de Insight da IA Emocional",
+      "description": "Pop-up que aparece após o usuário concluir uma atividade de meditação ou journaling.",
+      "layout_and_content": "A IA oferece um insight personalizado, como: 'Você mostrou progresso ao lidar com distrações hoje. Continue respirando e confie no processo 💙'."
+    }
+  ]
+}

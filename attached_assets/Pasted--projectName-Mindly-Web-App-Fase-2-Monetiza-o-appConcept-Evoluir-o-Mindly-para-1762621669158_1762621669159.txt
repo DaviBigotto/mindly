@@ -1,0 +1,62 @@
+{
+  "projectName": "Mindly Web App - Fase 2 (Monetização)",
+  "appConcept": "Evoluir o Mindly para um modelo freemium, oferecendo acesso gratuito limitado a recursos básicos e desbloqueio completo através de uma assinatura 'Mindly Pro'. O objetivo é criar uma experiência que incentive o autocuidado contínuo e o engajamento diário, com IA e trilhas de meditação exclusivas para assinantes.",
+  "designSystem": {
+    "instruction": "Manter o mesmo design system (cores, tipografia e estética) definido na Fase 1, reforçando a identidade calma e minimalista do Mindly. Preservar o equilíbrio visual e o tom acolhedor em todas as telas."
+  },
+  "userFlowAndMonetization": {
+    "objective": "Projetar um fluxo de usuário intuitivo e sereno para registro, login e upgrade ao plano 'Mindly Pro'.",
+    "freeTierAccess": "Usuários gratuitos têm acesso apenas às categorias básicas: 'Relaxamento' (1 meditação gratuita) e 'Modo Foco' limitado (até 2 sessões por dia).",
+    "proTierAccess": "Acesso total a todas as meditações, IA emocional ilimitada (análise de humor + respostas personalizadas), trilhas sonoras premium e modo foco com relatórios de produtividade.",
+    "proTierPrice": "R$ 29,90/mês",
+    "techStackUIIntegration": {
+      "supabase": "Desenhar as interfaces para autenticação de usuários (login, cadastro, recuperação de senha) integradas com Supabase.",
+      "stripe": "Projetar a interface de checkout integrada com Stripe para o processamento de pagamentos e gestão de assinaturas."
+    }
+  },
+  "newPagesAndComponents": [
+    {
+      "componentName": "Página de Login / Cadastro",
+      "layout": "Tela minimalista e acolhedora com duas abas: 'Entrar' e 'Criar Conta'. Fundo em gradiente azul claro (#7DD3FC) com elementos sutis de ondas ou orbes translúcidas. Usar tipografia Poppins e Inter conforme o design system.",
+      "fields_login": "Email, Senha, link 'Esqueci minha senha'.",
+      "fields_signup": "Nome, Email, Senha.",
+      "extras": "Botões de login social (Google, Apple)."
+    },
+    {
+      "componentName": "Componente de Paywall (Modal)",
+      "trigger": "Aparece quando o usuário gratuito tenta acessar categorias bloqueadas ('Sono', 'Ansiedade', 'Autoconfiança') ou usar a IA de humor ilimitadamente.",
+      "layout": "Pop-up elegante e sereno com o título: 'Desbloqueie o Mindly Pro 🌿'. Texto descritivo com os benefícios: 'Meditações exclusivas, IA emocional ilimitada e relatórios de bem-estar'.",
+      "ctaButton": "Botão principal: 'Tornar-se Pro - R$ 29,90/mês'.",
+      "secondaryText": "Texto menor reforçando o propósito: 'Invista em sua paz mental — menos café, mais calma ☕🧘‍♀️'."
+    },
+    {
+      "componentName": "Página de Checkout",
+      "trigger": "Acessada após o clique no botão do paywall.",
+      "layout": "Design limpo e inspirador. Header com o nome do produto 'Assinatura Mindly Pro'. Fundo branco com toques em azul claro. Mostrar resumo do pedido: 'Plano Mensal - Acesso completo a todas as meditações e IA emocional'.",
+      "paymentForm": "Campos do Stripe Elements: Número do Cartão, Validade (MM/AA), CVC.",
+      "ctaButton": "Botão grande e claro: 'Finalizar Assinatura'.",
+      "trustElements": "Adicionar selos de segurança e logos do Stripe, Visa, Mastercard. Microcopy: 'Pagamento 100% seguro via Stripe'."
+    },
+    {
+      "componentName": "Success / Confirmation Modal",
+      "description": "Pop-up exibido após o pagamento aprovado.",
+      "layout_and_content": "Ícone grande de check (✓), mensagem: 'Bem-vindo(a) ao Mindly Pro 🌸'. Subtexto: 'Seu novo espaço de calma e foco está liberado!'. Botão CTA: 'Começar minha jornada'."
+    },
+    {
+      "componentName": "Área do Usuário - Assinatura e Faturamento",
+      "description": "Seção dentro do Perfil do Usuário para gerenciar a assinatura e dados de pagamento.",
+      "layout_and_content": [
+        "Status: 'Plano Mindly Pro Ativo'.",
+        "Próxima Cobrança: [Data próxima cobrança].",
+        "Método de Pagamento: 'Cartão final **** 4242'.",
+        "Botão: 'Gerenciar Assinatura e Faturas' (redireciona para o Stripe Customer Portal).",
+        "Mensagem adicional: 'Você pode cancelar ou atualizar sua forma de pagamento a qualquer momento.'"
+      ]
+    }
+  ],
+  "core_philosophy_for_checkout": {
+    "principle_1_trust": "Transparência e confiança são essenciais. O design deve transmitir serenidade e segurança. Usar microcopy empática, como 'Sua tranquilidade está em boas mãos'.",
+    "principle_2_frictionless": "Fluxo direto e rápido. Reduzir campos desnecessários e distrações. O usuário deve concluir a assinatura com poucos cliques.",
+    "principle_3_clarity": "Informações de preço, termos e acesso devem ser completamente claras, reforçando o valor de investir em bem-estar."
+  }
+}

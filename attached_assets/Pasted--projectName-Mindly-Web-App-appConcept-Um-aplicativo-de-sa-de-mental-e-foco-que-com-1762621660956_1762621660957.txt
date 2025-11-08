@@ -1,0 +1,66 @@
+{
+  "projectName": "Mindly Web App",
+  "appConcept": "Um aplicativo de saúde mental e foco que combina inteligência artificial, meditações guiadas e acompanhamento emocional para ajudar usuários a reduzirem o estresse, melhorarem o foco e viverem com mais equilíbrio.",
+  "designSystem": {
+    "aesthetic": "Calmo, minimalista e acolhedor. Transmite tranquilidade e clareza mental, inspirado em apps como Calm, Stoic e Finch. Interface com muito espaço em branco e transições suaves.",
+    "colorPalette": {
+      "primary": "#4C8BF5 (azul mente calma)",
+      "secondary": "#7DD3FC (azul claro foco)",
+      "accent": "#F3F4F6 (cinza claro)",
+      "text": "#1F2937 (cinza escuro)",
+      "white": "#FFFFFF"
+    },
+    "typography": {
+      "headers": "Poppins, Semibold",
+      "body": "Inter, Regular"
+    },
+    "iconographyAndGraphics": "Usar ícones lineares suaves e ilustrações vetoriais minimalistas (pessoas meditando, orbes, nuvens, ondas, luzes suaves). Evitar imagens realistas."
+  },
+  "pages": [
+    {
+      "pageName": "Página Inicial (Homepage)",
+      "layout": "Header com o logotipo Mindly e o slogan 'Equilíbrio entre Mente e Produtividade'. Um bloco central com três grandes cards de navegação: 'Meditar Agora', 'Diário Emocional', 'Modo Foco'. Cada card deve conter um ícone representativo e uma breve descrição. Ao fundo, um gradiente suave azul-claro."
+    },
+    {
+      "pageName": "Página de Meditação Guiada",
+      "description": "Sessões de áudio curtas (3, 5, 10 minutos) que o usuário pode iniciar com um clique.",
+      "layout": [
+        "Header com o título: 'Medite com o Mindly 🧘'",
+        "Grade com categorias de meditação: 'Foco', 'Relaxamento', 'Sono', 'Ansiedade', 'Autoconfiança'.",
+        "Cada card de categoria deve ter uma ilustração e ao clicar abrir uma lista de sessões guiadas.",
+        "Cada sessão possui: título, duração, botão 'Ouvir Agora' e descrição breve."
+      ]
+    },
+    {
+      "pageName": "Página do Diário Emocional (Mind Journal)",
+      "description": "Um espaço para o usuário registrar seus sentimentos e pensamentos.",
+      "layout": [
+        "Header com o título: 'Como você se sente hoje?'",
+        "Campo de texto grande para o usuário escrever livremente.",
+        "Botão de envio ('Analisar meu humor').",
+        "Ao enviar, a IA analisa o texto e retorna uma resposta empática ('Você parece cansado hoje, que tal uma pausa?') e registra o humor no histórico.",
+        "Abaixo, um gráfico semanal mostrando variação do humor (positivo, neutro, negativo)."
+      ]
+    },
+    {
+      "pageName": "Página do Modo Foco",
+      "description": "Modo de produtividade com técnicas de respiração e temporizador Pomodoro.",
+      "layout": [
+        "Header: 'Entre em Foco 🎯'",
+        "Timer Pomodoro central (25:00) com botões 'Iniciar', 'Pausar', 'Resetar'.",
+        "Sugestão de música ambiente ou ruído branco (chuva, floresta, vento).",
+        "Dicas de respiração e frases motivacionais curtas ('Respire. Você está indo bem.')."
+      ]
+    },
+    {
+      "pageName": "Página de Perfil do Usuário",
+      "description": "Área pessoal do usuário para visualizar progresso e personalizar experiências.",
+      "layout": [
+        "Foto/avatar do usuário.",
+        "Gráfico de humor da semana e minutos de meditação praticados.",
+        "Configurações de notificações, tema claro/escuro e idioma.",
+        "Botão para exportar relatório emocional (PDF)."
+      ]
+    }
+  ]
+}
