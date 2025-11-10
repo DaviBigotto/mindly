@@ -1,50 +1,29 @@
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { useToast } from "@/hooks/use-toast";
-import { isUnauthorizedError } from "@/lib/authUtils";
-import { Brain, ArrowLeft, Play, Pause, RotateCcw, Cloud, Music, Wind } from "lucide-react";
-import { Link } from "wouter";
-
-type AmbientSound = "none" | "rain" | "forest" | "wind";
+import { Brain, ArrowLeft, Play, Pause, RotateCcw, Sparkles } from "lucide-react";
+import { Link, useLocation } from "wouter";
+import { useAppData } from "@/context/app-data";
+import { motion } from "framer-motion";
 
 export default function Focus() {
-  const { user } = useAuth();
+  const { user, isPro } = useAuth();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
+  const { recordFocusSession } = useAppData();
   const [timeLeft, setTimeLeft] = useState(25 * 60); // 25 minutes in seconds
   const [isActive, setIsActive] = useState(false);
-  const [selectedSound, setSelectedSound] = useState<AmbientSound>("none");
+  const [showPaywall, setShowPaywall] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  const saveMutation = useMutation({
-    mutationFn: async (duration: number) => {
-      await apiRequest("POST", "/api/focus/complete", { duration });
-    },
-    onSuccess: () => {
-      toast({
-        title: "Sessão concluída",
-        description: "Parabéns! Sua sessão de foco foi registrada",
-      });
-    },
-    onError: (error: Error) => {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: "Não autorizado",
-          description: "Você precisa estar logado para continuar",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
-        return;
-      }
-    },
-  });
+  const focusElapsedMinutes = Math.max(
+    0,
+    Math.floor((25 * 60 - timeLeft) / 60),
+  );
 
   useEffect(() => {
     if (isActive && timeLeft > 0) {
@@ -53,7 +32,7 @@ export default function Focus() {
           if (prev <= 1) {
             setIsActive(false);
             // Save completed session
-            saveMutation.mutate(25);
+            recordFocusSession(25);
             toast({
               title: "Tempo esgotado!",
               description: "Parabéns! Você completou uma sessão de foco de 25 minutos",
@@ -72,9 +51,13 @@ export default function Focus() {
         clearInterval(intervalRef.current);
       }
     };
-  }, [isActive, timeLeft]);
+  }, [isActive, timeLeft, recordFocusSession, toast]);
 
   const toggleTimer = () => {
+    if (!isPro) {
+      setShowPaywall(true);
+      return;
+    }
     setIsActive(!isActive);
   };
 
@@ -117,40 +100,51 @@ export default function Focus() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-secondary/20 via-background to-primary/10">
-      {/* Header */}
-      <header className="border-b bg-background/80 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+    <div className="relative min-h-screen overflow-hidden bg-background">
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute -top-24 left-1/2 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-primary/15 blur-3xl" />
+        <div className="absolute top-40 -right-16 h-[360px] w-[360px] rounded-full bg-secondary/20 blur-3xl" />
+        <div className="absolute bottom-0 left-8 h-[320px] w-[320px] rounded-full bg-primary/10 blur-3xl" />
+      </div>
+
+      <header className="border-b border-border/60 bg-background/70 backdrop-blur-xl">
+        <div className="container mx-auto flex items-center justify-between px-4 py-4">
           <div className="flex items-center gap-3">
             <Button
               variant="ghost"
               size="icon"
               asChild
-              className="rounded-full"
+              className="rounded-full border border-primary/20 bg-primary/10 text-primary shadow-inner shadow-primary/20"
               data-testid="button-back"
             >
-              <Link href="/">
-                <ArrowLeft className="w-5 h-5" />
+              <Link href="/home">
+                <ArrowLeft className="h-5 w-5" />
               </Link>
             </Button>
             <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
-                <Brain className="w-6 h-6 text-primary-foreground" />
+              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/20 shadow-lg shadow-primary/20">
+                <Brain className="h-6 w-6 text-primary" />
               </div>
-              <span className="text-xl font-heading font-semibold">Mindly</span>
+              <div>
+                <p className="text-xs uppercase tracking-[0.4em] text-primary/70">
+                  Mindly
+                </p>
+                <p className="font-heading text-lg font-semibold text-foreground">
+                  Modo foco consciente
+                </p>
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <ThemeToggle />
             <Button
               variant="ghost"
               size="icon"
               asChild
-              className="rounded-full"
+              className="rounded-full border border-primary/20 bg-primary/10 shadow-inner shadow-primary/20"
               data-testid="button-profile"
             >
               <Link href="/profile">
-                <Avatar className="w-9 h-9">
+                <Avatar className="h-9 w-9">
                   <AvatarImage src={user?.profileImageUrl || undefined} alt="Perfil" />
                   <AvatarFallback>{getInitials()}</AvatarFallback>
                 </Avatar>
@@ -160,27 +154,55 @@ export default function Focus() {
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-12">
-        <div className="max-w-3xl mx-auto space-y-8">
-          {/* Header */}
-          <div className="text-center space-y-2">
-            <h1 className="text-4xl font-heading font-bold">
-              Entre em Foco
-            </h1>
-            <p className="text-lg text-muted-foreground">
-              Use o timer Pomodoro para produtividade consciente
-            </p>
-          </div>
+      <main className="container mx-auto px-4 pb-16 pt-12">
+        <div className="mx-auto max-w-4xl space-y-10 md:space-y-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="relative overflow-hidden rounded-[32px] border border-white/50 bg-white/70 p-8 shadow-xl shadow-primary/10 backdrop-blur-xl dark:border-white/10 dark:bg-white/5"
+          >
+            <div className="absolute -right-20 top-10 h-44 w-44 rounded-full bg-primary/10" />
+            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+              <div className="space-y-3">
+                <Badge className="inline-flex items-center gap-2 rounded-full bg-primary/15 text-primary">
+                  Ritmo Mindly
+                </Badge>
+                <h1 className="text-4xl font-heading font-semibold text-foreground md:text-[2.6rem]">
+                  Entre em foco com gentileza.
+                </h1>
+                <p className="text-base text-muted-foreground">
+                  Use ciclos de atenção guiados e pausas
+                  restauradoras para manter produtividade sem esgotamento.
+                  Estamos aqui para lembrar você de respirar entre as entregas.
+                </p>
+              </div>
+              <div className="w-full max-w-xs rounded-2xl border border-primary/15 bg-primary/10 p-5 text-primary shadow-inner shadow-primary/20">
+                <p className="text-xs uppercase tracking-[0.3em]">
+                  Minutos focados hoje
+                </p>
+                <p className="mt-3 text-3xl font-heading font-semibold">
+                  {focusElapsedMinutes} min
+                </p>
+                <p className="mt-2 text-xs text-primary/80">
+                  Mantenha ciclos curtos e gentis. Pausas conscientes evitam o
+                  cansaço e preservam sua criatividade.
+                </p>
+              </div>
+            </div>
+          </motion.div>
 
-          {/* Timer Card */}
-          <Card className="overflow-hidden">
-            <CardContent className="p-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.05, ease: "easeOut" }}
+            className="overflow-hidden rounded-[32px] border border-white/50 bg-white/70 shadow-lg shadow-primary/10 backdrop-blur-xl dark:border-white/10 dark:bg-white/5"
+          >
+            <CardContent className="p-10 md:p-12">
               <div className="space-y-8">
-                {/* Timer Display */}
-                <div className="text-center space-y-6">
-                  <div className="relative inline-block">
-                    <svg className="w-64 h-64 -rotate-90">
+                <div className="text-center space-y-7">
+                  <div className="relative mx-auto inline-block">
+                    <svg className="h-64 w-64 -rotate-90 text-primary/10">
                       <circle
                         cx="128"
                         cy="128"
@@ -188,44 +210,47 @@ export default function Focus() {
                         stroke="currentColor"
                         strokeWidth="8"
                         fill="none"
-                        className="text-muted/20"
                       />
                       <circle
                         cx="128"
                         cy="128"
                         r="120"
-                        stroke="currentColor"
+                        stroke="hsl(var(--primary))"
                         strokeWidth="8"
                         fill="none"
                         strokeDasharray={`${2 * Math.PI * 120}`}
                         strokeDashoffset={`${2 * Math.PI * 120 * (1 - progress / 100)}`}
-                        className="text-primary transition-all duration-1000"
+                        className="transition-all duration-1000"
                         strokeLinecap="round"
                       />
                     </svg>
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-6xl font-heading font-bold" data-testid="text-timer">
+                      <span
+                        className="text-6xl font-heading font-semibold text-foreground"
+                        data-testid="text-timer"
+                      >
                         {formatTime(timeLeft)}
                       </span>
                     </div>
                   </div>
-
-                  {/* Control Buttons */}
-                  <div className="flex items-center justify-center gap-4">
+                  <p className="text-sm uppercase tracking-[0.4em] text-primary/70">
+                    Ciclo Pomodoro Mindly
+                  </p>
+                  <div className="flex flex-wrap items-center justify-center gap-4">
                     <Button
                       size="lg"
                       onClick={toggleTimer}
-                      className="min-w-[140px]"
+                      className="min-w-[150px] rounded-full bg-primary shadow-lg shadow-primary/25"
                       data-testid="button-toggle-timer"
                     >
                       {isActive ? (
                         <>
-                          <Pause className="w-5 h-5 mr-2" />
+                          <Pause className="mr-2 h-5 w-5" />
                           Pausar
                         </>
                       ) : (
                         <>
-                          <Play className="w-5 h-5 mr-2" />
+                          <Play className="mr-2 h-5 w-5" />
                           {timeLeft === 25 * 60 ? "Iniciar" : "Continuar"}
                         </>
                       )}
@@ -234,72 +259,119 @@ export default function Focus() {
                       size="lg"
                       variant="outline"
                       onClick={resetTimer}
+                      className="rounded-full border-primary/30 text-primary"
                       data-testid="button-reset-timer"
                     >
-                      <RotateCcw className="w-5 h-5 mr-2" />
+                      <RotateCcw className="mr-2 h-5 w-5" />
                       Resetar
                     </Button>
                   </div>
                 </div>
               </div>
             </CardContent>
-          </Card>
+          </motion.div>
 
-          {/* Ambient Sounds */}
-          <Card>
-            <CardContent className="p-6">
-              <h3 className="text-lg font-heading font-semibold mb-4">Sons Ambiente</h3>
-              <div className="grid grid-cols-4 gap-3">
-                <Button
-                  variant={selectedSound === "none" ? "default" : "outline"}
-                  onClick={() => setSelectedSound("none")}
-                  className="flex flex-col h-auto py-4 gap-2"
-                  data-testid="button-sound-none"
-                >
-                  <Music className="w-5 h-5" />
-                  <span className="text-xs">Silêncio</span>
-                </Button>
-                <Button
-                  variant={selectedSound === "rain" ? "default" : "outline"}
-                  onClick={() => setSelectedSound("rain")}
-                  className="flex flex-col h-auto py-4 gap-2"
-                  data-testid="button-sound-rain"
-                >
-                  <Cloud className="w-5 h-5" />
-                  <span className="text-xs">Chuva</span>
-                </Button>
-                <Button
-                  variant={selectedSound === "forest" ? "default" : "outline"}
-                  onClick={() => setSelectedSound("forest")}
-                  className="flex flex-col h-auto py-4 gap-2"
-                  data-testid="button-sound-forest"
-                >
-                  <Brain className="w-5 h-5" />
-                  <span className="text-xs">Floresta</span>
-                </Button>
-                <Button
-                  variant={selectedSound === "wind" ? "default" : "outline"}
-                  onClick={() => setSelectedSound("wind")}
-                  className="flex flex-col h-auto py-4 gap-2"
-                  data-testid="button-sound-wind"
-                >
-                  <Wind className="w-5 h-5" />
-                  <span className="text-xs">Vento</span>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.15, ease: "easeOut" }}
+          >
+            <Card className="border border-white/50 bg-white/80 shadow-lg shadow-primary/10 backdrop-blur-xl dark:border-white/10 dark:bg-white/5">
+              <CardContent className="p-6 text-center">
+                <p className="text-lg font-medium text-foreground transition-all duration-500">
+                  {breathingTips[currentTip]}
+                </p>
+              </CardContent>
+            </Card>
+          </motion.div>
 
-          {/* Breathing Tips */}
-          <Card className="bg-primary/5 border-primary/10">
-            <CardContent className="p-6 text-center">
-              <p className="text-lg text-foreground font-medium transition-all duration-500">
-                {breathingTips[currentTip]}
-              </p>
-            </CardContent>
-          </Card>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
+          >
+            <Card className="border border-white/50 bg-white/75 shadow-lg shadow-primary/10 backdrop-blur-xl dark:border-white/10 dark:bg-white/5">
+              <CardContent className="flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+                    <Sparkles className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">
+                      Dica mindful
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      A cada ciclo concluído, levante-se, alongue os ombros e
+                      solte o maxilar. Seu corpo agradece.
+                    </p>
+                  </div>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  className="text-primary"
+                  onClick={() => {
+                    if (!isPro) {
+                      setShowPaywall(true);
+                    }
+                  }}
+                >
+                  Abrir biblioteca de alongamentos
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
         </div>
       </main>
+
+      {/* Paywall Modal */}
+      <Dialog open={showPaywall} onOpenChange={setShowPaywall}>
+        <DialogContent className="max-w-md" data-testid="modal-paywall">
+          <DialogHeader className="space-y-4">
+            <div className="w-16 h-16 rounded-full bg-pro/20 flex items-center justify-center mx-auto">
+              <Sparkles className="w-8 h-8 text-pro" />
+            </div>
+            <DialogTitle className="text-2xl font-heading text-center">
+              Desbloqueie o Mindly Pro
+            </DialogTitle>
+            <DialogDescription className="text-center space-y-4">
+              <p className="text-base">
+                Acesse meditações exclusivas, IA emocional ilimitada e relatórios de bem-estar
+              </p>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2 justify-center text-muted-foreground">
+                  <div className="w-1.5 h-1.5 rounded-full bg-pro" />
+                  <span>Todas as categorias de meditação</span>
+                </div>
+                <div className="flex items-center gap-2 justify-center text-muted-foreground">
+                  <div className="w-1.5 h-1.5 rounded-full bg-pro" />
+                  <span>IA emocional ilimitada</span>
+                </div>
+                <div className="flex items-center gap-2 justify-center text-muted-foreground">
+                  <div className="w-1.5 h-1.5 rounded-full bg-pro" />
+                  <span>Modo foco com timer Pomodoro</span>
+                </div>
+                <div className="flex items-center gap-2 justify-center text-muted-foreground">
+                  <div className="w-1.5 h-1.5 rounded-full bg-pro" />
+                  <span>Trilhas de transformação</span>
+                </div>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <Button
+              className="w-full bg-pro hover:bg-pro/90 text-white"
+              size="lg"
+              onClick={() => setLocation("/subscribe")}
+              data-testid="button-subscribe-pro"
+            >
+              Tornar-se Pro - R$ 19,90/mês
+            </Button>
+            <p className="text-xs text-center text-muted-foreground">
+              Invista em sua paz mental — menos café, mais calma
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

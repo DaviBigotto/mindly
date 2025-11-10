@@ -9,6 +9,20 @@ import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
 
+const authDisabled =
+  !process.env.REPL_ID ||
+  !process.env.ISSUER_URL ||
+  process.env.DISABLE_AUTH === "true";
+
+const devUserClaims = {
+  sub: "dev-user",
+  email: process.env.DEV_USER_EMAIL ?? "demo@mindly.app",
+  first_name: process.env.DEV_USER_FIRST_NAME ?? "Mindly",
+  last_name: process.env.DEV_USER_LAST_NAME ?? "Dev",
+  profile_image_url: process.env.DEV_USER_AVATAR ?? "",
+  exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 365,
+};
+
 const getOidcConfig = memoize(
   async () => {
     return await client.discovery(
@@ -20,6 +34,9 @@ const getOidcConfig = memoize(
 );
 
 export function getSession() {
+  if (authDisabled) {
+    throw new Error("Session store should not be used when auth is disabled");
+  }
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
   const pgStore = connectPg(session);
   const sessionStore = new pgStore({
@@ -64,6 +81,74 @@ async function upsertUser(
 }
 
 export async function setupAuth(app: Express) {
+  if (authDisabled) {
+    // Middleware to handle user authentication in dev mode
+    // Checks for X-User-Email header to identify the logged-in user
+    app.use(async (req, _res, next) => {
+      // Check if there's a user email in the request headers (set by frontend)
+      const userEmail = req.headers["x-user-email"] as string | undefined;
+      
+      let userClaims = devUserClaims;
+      
+      if (userEmail) {
+        // Try to find user by email in database
+        const existingUser = await storage.getUserByEmail(userEmail);
+        if (existingUser) {
+          // Use existing user's data
+          userClaims = {
+            sub: existingUser.id,
+            email: existingUser.email,
+            first_name: existingUser.firstName || "User",
+            last_name: existingUser.lastName || "",
+            profile_image_url: existingUser.profileImageUrl || "",
+            exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 365,
+          };
+        } else {
+          // Create user claims from email
+          userClaims = {
+            sub: `user-${userEmail.replace(/[^a-zA-Z0-9]/g, "-")}`,
+            email: userEmail,
+            first_name: "User",
+            last_name: "",
+            profile_image_url: "",
+            exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 365,
+          };
+        }
+      }
+      
+      const user = (req as any).user ?? { claims: userClaims };
+      (req as any).user = user;
+      
+      // Upsert user to ensure it exists in database
+      // If user exists, preserve their data; otherwise create new user
+      const existingUser = await storage.getUserByEmail(user.claims.email);
+      if (existingUser) {
+        // Update user claims with existing data to preserve Pro status, etc.
+        user.claims.sub = existingUser.id;
+        user.claims.first_name = existingUser.firstName || user.claims.first_name;
+        user.claims.last_name = existingUser.lastName || user.claims.last_name;
+        user.claims.profile_image_url = existingUser.profileImageUrl || user.claims.profile_image_url;
+        (req as any).user = { claims: user.claims };
+      } else {
+        // Create new user
+        await storage.upsertUser({
+          id: user.claims.sub,
+          email: user.claims.email,
+          firstName: user.claims.first_name,
+          lastName: user.claims.last_name,
+          profileImageUrl: user.claims.profile_image_url,
+        });
+      }
+      
+      next();
+    });
+
+    app.get("/api/login", (_req, res) => res.redirect("/"));
+    app.get("/api/logout", (_req, res) => res.redirect("/"));
+    app.get("/api/callback", (_req, res) => res.redirect("/"));
+    return;
+  }
+
   app.set("trust proxy", 1);
   app.use(getSession());
   app.use(passport.initialize());
@@ -134,6 +219,12 @@ export async function setupAuth(app: Express) {
 }
 
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
+  if (authDisabled) {
+    if (!(req as any).user) {
+      (req as any).user = { claims: devUserClaims };
+    }
+    return next();
+  }
   const user = req.user as any;
 
   if (!req.isAuthenticated() || !user.expires_at) {

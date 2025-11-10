@@ -19,10 +19,10 @@ export function log(message: string, source = "express") {
   console.log(`${formattedTime} [${source}] ${message}`);
 }
 
-export async function setupVite(app: Express, server: Server) {
+export async function setupVite(app: Express, server?: Server | null) {
   const serverOptions = {
     middlewareMode: true,
-    hmr: { server },
+    hmr: server ? { server } : false,
     allowedHosts: true as const,
   };
 
@@ -40,9 +40,21 @@ export async function setupVite(app: Express, server: Server) {
     appType: "custom",
   });
 
-  app.use(vite.middlewares);
+  // Only apply Vite middleware for non-API routes
+  app.use((req, res, next) => {
+    if (req.path.startsWith("/api/")) {
+      return next();
+    }
+    vite.middlewares(req, res, next);
+  });
+  
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;
+
+    // Don't handle API routes - let Express handle them
+    if (url.startsWith("/api/")) {
+      return next();
+    }
 
     try {
       const clientTemplate = path.resolve(
@@ -68,11 +80,30 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  const distPath = path.resolve(import.meta.dirname, "public");
+  // In production, after build:
+  // - Server compiled to: dist/index.js
+  // - Static files compiled to: dist/public/
+  // We need to resolve relative to where the server is running from
+  
+  // Try multiple possible paths
+  const possiblePaths = [
+    path.resolve(process.cwd(), "dist", "public"), // Most common in production
+    path.resolve(import.meta.dirname || __dirname || process.cwd(), "public"), // Relative to server file
+    path.resolve(process.cwd(), "public"), // Direct public folder
+  ];
 
-  if (!fs.existsSync(distPath)) {
+  let distPath: string | null = null;
+  for (const possiblePath of possiblePaths) {
+    if (fs.existsSync(possiblePath) && fs.existsSync(path.join(possiblePath, "index.html"))) {
+      distPath = possiblePath;
+      break;
+    }
+  }
+
+  if (!distPath) {
     throw new Error(
-      `Could not find the build directory: ${distPath}, make sure to build the client first`,
+      `Could not find the build directory. Tried: ${possiblePaths.join(", ")}\n` +
+      `Make sure to run 'npm run build' before starting the server.`
     );
   }
 
@@ -80,6 +111,6 @@ export function serveStatic(app: Express) {
 
   // fall through to index.html if the file doesn't exist
   app.use("*", (_req, res) => {
-    res.sendFile(path.resolve(distPath, "index.html"));
+    res.sendFile(path.resolve(distPath!, "index.html"));
   });
 }

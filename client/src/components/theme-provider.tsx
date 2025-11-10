@@ -1,6 +1,6 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect } from "react";
 
-type Theme = "light" | "dark";
+type Theme = "dark";
 
 type ThemeProviderProps = {
   children: React.ReactNode;
@@ -13,7 +13,7 @@ type ThemeProviderState = {
 };
 
 const initialState: ThemeProviderState = {
-  theme: "light",
+  theme: "dark",
   setTheme: () => null,
 };
 
@@ -21,22 +21,17 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
 export function ThemeProvider({
   children,
-  defaultTheme = "light",
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem("mindly-theme") as Theme) || defaultTheme
-  );
-
   useEffect(() => {
     const root = document.documentElement;
     root.classList.remove("light", "dark");
-    root.classList.add(theme);
-    localStorage.setItem("mindly-theme", theme);
-  }, [theme]);
+    root.classList.add("dark");
+    localStorage.setItem("mindly-theme", "dark");
+  }, []);
 
   const value = {
-    theme,
-    setTheme,
+    theme: "dark" as Theme,
+    setTheme: () => null,
   };
 
   return (

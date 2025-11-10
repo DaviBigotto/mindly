@@ -23,7 +23,10 @@ import {
   type TrackStep,
   type UserTrackProgress,
   type PremiumSound,
-} from "@shared/schema";
+  kiwifyWebhookLogs,
+  type KiwifyWebhookLog,
+  type InsertKiwifyWebhookLog,
+} from "../shared/schema";
 import { db } from "./db";
 import { eq, desc, and, gte, sql } from "drizzle-orm";
 
@@ -32,7 +35,17 @@ export interface IStorage {
   // User operations - Replit Auth
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
-  updateUserStripeInfo(userId: string, stripeCustomerId: string, stripeSubscriptionId: string): Promise<User>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  updateUserPlanByEmail(email: string, plan: string, storageLimitMb: number, isPro: boolean): Promise<User | undefined>;
+  updateUserPlanById(userId: string, plan: string, storageLimitMb: number, isPro: boolean): Promise<User | undefined>;
+  
+  // Webhook logs
+  createKiwifyWebhookLog(log: InsertKiwifyWebhookLog): Promise<KiwifyWebhookLog>;
+  updateKiwifyWebhookLog(
+    id: string,
+    data: Partial<Pick<KiwifyWebhookLog, "processed" | "status" | "message">>,
+  ): Promise<KiwifyWebhookLog | undefined>;
+  getKiwifyWebhookLogs(limit?: number): Promise<KiwifyWebhookLog[]>;
   
   // Journal operations
   createJournalEntry(entry: InsertJournalEntry): Promise<JournalEntry>;
@@ -74,6 +87,11 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
+  }
+
   async upsertUser(userData: UpsertUser): Promise<User> {
     const [user] = await db
       .insert(users)
@@ -89,18 +107,67 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async updateUserStripeInfo(userId: string, stripeCustomerId: string, stripeSubscriptionId: string): Promise<User> {
+  async updateUserPlanByEmail(
+    email: string,
+    plan: string,
+    storageLimitMb: number,
+    isPro: boolean,
+  ): Promise<User | undefined> {
     const [user] = await db
       .update(users)
       .set({
-        stripeCustomerId,
-        stripeSubscriptionId,
-        isPro: true,
+        plan,
+        storageLimitMb,
+        isPro,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.email, email))
+      .returning();
+    return user;
+  }
+
+  async updateUserPlanById(
+    userId: string,
+    plan: string,
+    storageLimitMb: number,
+    isPro: boolean,
+  ): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set({
+        plan,
+        storageLimitMb,
+        isPro,
         updatedAt: new Date(),
       })
       .where(eq(users.id, userId))
       .returning();
     return user;
+  }
+
+  async createKiwifyWebhookLog(log: InsertKiwifyWebhookLog): Promise<KiwifyWebhookLog> {
+    const [entry] = await db.insert(kiwifyWebhookLogs).values(log).returning();
+    return entry;
+  }
+
+  async updateKiwifyWebhookLog(
+    id: string,
+    data: Partial<Pick<KiwifyWebhookLog, "processed" | "status" | "message">>,
+  ): Promise<KiwifyWebhookLog | undefined> {
+    const [entry] = await db
+      .update(kiwifyWebhookLogs)
+      .set(data)
+      .where(eq(kiwifyWebhookLogs.id, id))
+      .returning();
+    return entry;
+  }
+
+  async getKiwifyWebhookLogs(limit = 50): Promise<KiwifyWebhookLog[]> {
+    return await db
+      .select()
+      .from(kiwifyWebhookLogs)
+      .orderBy(desc(kiwifyWebhookLogs.createdAt))
+      .limit(limit);
   }
 
   // Journal operations

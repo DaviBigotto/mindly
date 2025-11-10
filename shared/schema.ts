@@ -33,8 +33,8 @@ export const users = pgTable("users", {
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
   isPro: boolean("is_pro").default(false).notNull(),
-  stripeCustomerId: varchar("stripe_customer_id"),
-  stripeSubscriptionId: varchar("stripe_subscription_id"),
+  plan: varchar("plan", { length: 50 }).default("basic").notNull(),
+  storageLimitMb: integer("storage_limit_mb").default(256).notNull(),
   dailyJournalCount: integer("daily_journal_count").default(0).notNull(),
   lastJournalDate: timestamp("last_journal_date"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -43,6 +43,22 @@ export const users = pgTable("users", {
 
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
+
+export const kiwifyWebhookLogs = pgTable("kiwify_webhook_logs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  email: varchar("email", { length: 255 }),
+  evento: varchar("evento", { length: 255 }),
+  produto: varchar("produto", { length: 255 }),
+  tokenValid: boolean("token_valid").default(false).notNull(),
+  processed: boolean("processed").default(false).notNull(),
+  status: varchar("status", { length: 120 }),
+  message: text("message"),
+  payload: jsonb("payload"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type KiwifyWebhookLog = typeof kiwifyWebhookLogs.$inferSelect;
+export type InsertKiwifyWebhookLog = typeof kiwifyWebhookLogs.$inferInsert;
 
 // Journal entries with AI mood analysis
 export const journalEntries = pgTable("journal_entries", {
@@ -66,7 +82,13 @@ export const insertJournalEntrySchema = createInsertSchema(journalEntries).omit(
   createdAt: true,
 });
 
+// Schema for API request body (only content from frontend)
+export const createJournalEntryRequestSchema = z.object({
+  content: z.string().min(1, "O conteúdo não pode estar vazio"),
+});
+
 export type InsertJournalEntry = z.infer<typeof insertJournalEntrySchema>;
+export type CreateJournalEntryRequest = z.infer<typeof createJournalEntryRequestSchema>;
 export type JournalEntry = typeof journalEntries.$inferSelect;
 
 // Meditation categories and sessions

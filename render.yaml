@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: mindly-app
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    # Note: If using Supabase, remove the DATABASE_URL fromDatabase section
+    # and set it manually in the Render dashboard
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # DATABASE_URL - Set manually in Render dashboard:
+      # - If using Render PostgreSQL: Will be auto-set when you link the database
+      # - If using Supabase: Copy the connection string from Supabase dashboard
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: KIWIFY_WEBHOOK_TOKEN
+        sync: false
+      - key: KIWIFY_PRO_STORAGE_MB
+        value: "2048"
+      - key: KIWIFY_BASIC_STORAGE_MB
+        value: "256"
+      - key: VITE_KIWIFY_CHECKOUT_URL
+        value: "https://pay.kiwify.com.br/TXmPcok"
+      - key: VITE_KIWIFY_OFFER_MINUTES
+        value: "30"
+
+# Optional: Only include if using Render PostgreSQL (not Supabase)
+# databases:
+#   - name: mindly-db
+#     plan: free
+#     databaseName: mindly
+#     user: mindly_user
+

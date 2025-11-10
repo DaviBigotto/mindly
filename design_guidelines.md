@@ -77,12 +77,11 @@
 
 ### Checkout Page
 - Clean, inspiring design
-- Header: "Assinatura Mindly Pro"
-- White background with light blue accents
-- Order summary box: "Plano Mensal - Acesso completo"
-- Stripe Elements form (card number, expiry, CVC)
-- Large "Finalizar Assinatura" button
-- Trust elements: Stripe/Visa/Mastercard logos, "Pagamento 100% seguro via Stripe" text
+- Header: "Mindly Pro"
+- White background com detalhes em azul
+- Order summary box: "Licença vitalícia - Acesso completo"
+- CTA principal redirecionando para o checkout externo da Kiwify
+- Trust elements: selos de segurança e texto "Pagamento protegido pela Kiwify"
 
 ### Pro Bonus Hub
 - Header: "Bem-vindo(a) à sua Jornada Mindly Pro 💎"

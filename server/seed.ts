@@ -1,6 +1,6 @@
 // Database seed script - populate with initial meditation categories and sessions
 import { db } from "./db";
-import { meditationCategories, meditationSessions, proTracks, trackSteps, premiumSounds } from "@shared/schema";
+import { meditationCategories, meditationSessions, proTracks, trackSteps, premiumSounds } from "../../schema";
 
 async function seed() {
   console.log("🌱 Seeding database...");

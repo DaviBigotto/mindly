@@ -19,7 +19,7 @@ export default function NotFound() {
             </p>
           </div>
           <Button asChild size="lg" className="w-full" data-testid="button-home">
-            <Link href="/">Voltar ao Início</Link>
+            <Link href="/signup">Voltar ao Início</Link>
           </Button>
         </CardContent>
       </Card>

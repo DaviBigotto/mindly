@@ -8,10 +8,10 @@
     "objective": "Projetar um fluxo de usuário intuitivo e sereno para registro, login e upgrade ao plano 'Mindly Pro'.",
     "freeTierAccess": "Usuários gratuitos têm acesso apenas às categorias básicas: 'Relaxamento' (1 meditação gratuita) e 'Modo Foco' limitado (até 2 sessões por dia).",
     "proTierAccess": "Acesso total a todas as meditações, IA emocional ilimitada (análise de humor + respostas personalizadas), trilhas sonoras premium e modo foco com relatórios de produtividade.",
-    "proTierPrice": "R$ 29,90/mês",
+    "proTierPrice": "R$ 19,90/mês",
     "techStackUIIntegration": {
       "supabase": "Desenhar as interfaces para autenticação de usuários (login, cadastro, recuperação de senha) integradas com Supabase.",
-      "stripe": "Projetar a interface de checkout integrada com Stripe para o processamento de pagamentos e gestão de assinaturas."
+      "kiwify": "Projetar a transição para o checkout externo da Kiwify, responsável pelo processamento de pagamentos da licença Mindly Pro."
     }
   },
   "newPagesAndComponents": [
@@ -26,16 +26,16 @@
       "componentName": "Componente de Paywall (Modal)",
       "trigger": "Aparece quando o usuário gratuito tenta acessar categorias bloqueadas ('Sono', 'Ansiedade', 'Autoconfiança') ou usar a IA de humor ilimitadamente.",
       "layout": "Pop-up elegante e sereno com o título: 'Desbloqueie o Mindly Pro 🌿'. Texto descritivo com os benefícios: 'Meditações exclusivas, IA emocional ilimitada e relatórios de bem-estar'.",
-      "ctaButton": "Botão principal: 'Tornar-se Pro - R$ 29,90/mês'.",
+      "ctaButton": "Botão principal: 'Tornar-se Pro - R$ 19,90/mês'.",
       "secondaryText": "Texto menor reforçando o propósito: 'Invista em sua paz mental — menos café, mais calma ☕🧘‍♀️'."
     },
     {
       "componentName": "Página de Checkout",
       "trigger": "Acessada após o clique no botão do paywall.",
-      "layout": "Design limpo e inspirador. Header com o nome do produto 'Assinatura Mindly Pro'. Fundo branco com toques em azul claro. Mostrar resumo do pedido: 'Plano Mensal - Acesso completo a todas as meditações e IA emocional'.",
-      "paymentForm": "Campos do Stripe Elements: Número do Cartão, Validade (MM/AA), CVC.",
-      "ctaButton": "Botão grande e claro: 'Finalizar Assinatura'.",
-      "trustElements": "Adicionar selos de segurança e logos do Stripe, Visa, Mastercard. Microcopy: 'Pagamento 100% seguro via Stripe'."
+      "layout": "Design limpo e inspirador. Header com o nome do produto 'Mindly Pro'. Fundo branco com toques em azul claro. Mostrar resumo do pedido: 'Licença vitalícia - Acesso completo a todas as meditações e IA emocional'.",
+      "paymentForm": "CTA destacada que redireciona o usuário para o checkout seguro da Kiwify.",
+      "ctaButton": "Botão grande e claro: 'Comprar agora na Kiwify'.",
+      "trustElements": "Adicionar selos de segurança e texto 'Pagamento seguro via Kiwify'."
     },
     {
       "componentName": "Success / Confirmation Modal",
@@ -43,14 +43,14 @@
       "layout_and_content": "Ícone grande de check (✓), mensagem: 'Bem-vindo(a) ao Mindly Pro 🌸'. Subtexto: 'Seu novo espaço de calma e foco está liberado!'. Botão CTA: 'Começar minha jornada'."
     },
     {
-      "componentName": "Área do Usuário - Assinatura e Faturamento",
-      "description": "Seção dentro do Perfil do Usuário para gerenciar a assinatura e dados de pagamento.",
+      "componentName": "Área do Usuário - Acesso Pro",
+      "description": "Seção dentro do Perfil do Usuário para visualizar o status da licença Mindly Pro adquirida na Kiwify.",
       "layout_and_content": [
-        "Status: 'Plano Mindly Pro Ativo'.",
-        "Próxima Cobrança: [Data próxima cobrança].",
-        "Método de Pagamento: 'Cartão final **** 4242'.",
-        "Botão: 'Gerenciar Assinatura e Faturas' (redireciona para o Stripe Customer Portal).",
-        "Mensagem adicional: 'Você pode cancelar ou atualizar sua forma de pagamento a qualquer momento.'"
+        "Status: 'Mindly Pro Ativo'.",
+        "Modelo: 'Licença vitalícia'.",
+        "Mensagem: 'Pagamento processado pela Kiwify'.",
+        "Botão: 'Ver detalhes na Kiwify'.",
+        "Mensagem adicional: 'Em caso de dúvidas, entre em contato com nosso suporte.'"
       ]
     }
   ],

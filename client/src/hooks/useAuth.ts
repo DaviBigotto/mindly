@@ -1,17 +1,23 @@
 // Replit Auth integration - javascript_log_in_with_replit blueprint
-import { useQuery } from "@tanstack/react-query";
-import type { User } from "@shared/schema";
+import { useAppData } from "@/context/app-data";
 
 export function useAuth() {
-  const { data: user, isLoading } = useQuery<User>({
-    queryKey: ["/api/user"],
-    retry: false,
-  });
+  const {
+    user,
+    isPro,
+    isLoggedIn,
+    authenticateUser,
+    login,
+    logout,
+  } = useAppData();
 
   return {
     user,
-    isLoading,
-    isAuthenticated: !!user,
-    isPro: user?.isPro ?? false,
+    isLoading: false,
+    isAuthenticated: isLoggedIn,
+    isPro,
+    authenticate: authenticateUser,
+    login,
+    logout,
   };
 }
