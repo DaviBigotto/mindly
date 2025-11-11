@@ -214,9 +214,9 @@ VITE_KIWIFY_OFFER_MINUTES=30
 
 ---
 
-## 🗃️ PASSO 7: Configurar Banco de Dados
+## 🗃️ PASSO 7: Configurar Banco de Dados ⚠️ OBRIGATÓRIO
 
-Após o primeiro deploy, você precisa criar as tabelas no banco de dados.
+**⚠️ IMPORTANTE:** Este passo é **OBRIGATÓRIO**! Sem ele, o cadastro não funcionará!
 
 ### Opção A: Via Shell do Render (Recomendado)
 

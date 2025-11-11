@@ -38,9 +38,10 @@ VITE_KIWIFY_OFFER_MINUTES=30
 - Clique em "Create Web Service"
 - Aguarde o build completar
 
-### 6️⃣ Criar Tabelas no Banco (2 min)
+### 6️⃣ Criar Tabelas no Banco (2 min) ⚠️ OBRIGATÓRIO
 - No Render, vá em "Shell"
 - Execute: `npm run db:push`
+- **⚠️ SEM ISSO, O CADASTRO NÃO FUNCIONA!**
 
 ### 7️⃣ Configurar Webhook Kiwify (5 min)
 - URL: `https://seu-app.onrender.com/api/webhooks/kiwify`

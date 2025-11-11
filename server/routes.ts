@@ -221,9 +221,20 @@ export function registerRoutes(app: Express) {
     } catch (error) {
       console.error("Error syncing user:", error);
       res.setHeader("Content-Type", "application/json");
+      
+      // Check if error is related to missing tables
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      if (errorMessage.includes("relation") && errorMessage.includes("does not exist")) {
+        return res.status(500).json({
+          message: "Database tables not created. Please run 'npm run db:push' in the Render Shell.",
+          error: "Tables missing - run 'npm run db:push' to create them",
+          hint: "Go to Render Dashboard → Your Service → Shell → Run: npm run db:push",
+        });
+      }
+      
       return res.status(500).json({
         message: "Failed to sync user",
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: errorMessage,
       });
     }
   });
