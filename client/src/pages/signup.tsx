@@ -54,7 +54,7 @@ export default function Signup() {
 
     try {
       if (mode === "signup") {
-        authenticate({
+        await authenticate({
           firstName: form.firstName,
           lastName: form.lastName,
           email: form.email,
@@ -64,14 +64,15 @@ export default function Signup() {
           title: "Conta criada com sucesso",
           description: `Bem-vindo, ${form.firstName}! Preparamos uma experiência calma para sua jornada Mindly.`,
         });
+        setLocation("/home");
       } else {
-        login({ email: form.email, password: form.password });
+        await login({ email: form.email, password: form.password });
         toast({
           title: "Login realizado",
           description: "Bom te ver por aqui novamente. Continue sua jornada mindful.",
         });
+        setLocation("/home");
       }
-      setLocation("/home");
     } catch (error) {
       const message = error instanceof Error ? error.message : "Não foi possível concluir a ação.";
       toast({

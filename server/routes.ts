@@ -185,7 +185,7 @@ export function registerRoutes(app: Express) {
   // Sync user from frontend to backend (for dev mode)
   app.post("/api/users/sync", async (req: Request, res: Response) => {
     try {
-      const { email, firstName, lastName, profileImageUrl } = req.body;
+      const { email, firstName, lastName, profileImageUrl, password } = req.body;
 
       if (!email || typeof email !== "string") {
         res.setHeader("Content-Type", "application/json");
@@ -195,12 +195,15 @@ export function registerRoutes(app: Express) {
       // Generate a consistent ID from email
       const userId = `user-${email.replace(/[^a-zA-Z0-9]/g, "-")}`;
 
+      // Store password as plain text for now (in production, use bcrypt)
+      // TODO: Implement password hashing with bcrypt
       const user = await storage.upsertUser({
         id: userId,
         email,
         firstName: firstName || "User",
         lastName: lastName || "",
         profileImageUrl: profileImageUrl || "",
+        password: password || undefined, // Store password if provided
       });
 
       console.log("User synced from frontend:", user.email);
@@ -235,6 +238,63 @@ export function registerRoutes(app: Express) {
       return res.status(500).json({
         message: "Failed to sync user",
         error: errorMessage,
+      });
+    }
+  });
+
+  // Login endpoint - validate credentials against database
+  app.post("/api/auth/login", async (req: Request, res: Response) => {
+    try {
+      const { email, password } = req.body;
+
+      if (!email || !password) {
+        res.setHeader("Content-Type", "application/json");
+        return res.status(400).json({ message: "Email and password are required" });
+      }
+
+      // Find user by email
+      const user = await storage.getUserByEmail(email);
+      
+      if (!user) {
+        res.setHeader("Content-Type", "application/json");
+        return res.status(401).json({ message: "Credenciais inválidas" });
+      }
+
+      // Validate password (plain text comparison for now)
+      // TODO: Implement password hashing with bcrypt
+      if (user.password && user.password !== password) {
+        res.setHeader("Content-Type", "application/json");
+        return res.status(401).json({ message: "Credenciais inválidas" });
+      }
+
+      // If user exists but has no password, allow login (legacy users)
+      // This allows existing users to login without password
+      if (!user.password) {
+        console.log("User found but has no password set:", user.email);
+        // Allow login for users without password (legacy support)
+      }
+
+      console.log("User logged in:", user.email);
+
+      res.setHeader("Content-Type", "application/json");
+      return res.json({
+        message: "Login successful",
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          isPro: user.isPro,
+          plan: user.plan,
+          storageLimitMb: user.storageLimitMb,
+        },
+      });
+    } catch (error) {
+      console.error("Error during login:", error);
+      res.setHeader("Content-Type", "application/json");
+      return res.status(500).json({
+        message: "Failed to login",
+        error: error instanceof Error ? error.message : "Unknown error",
       });
     }
   });

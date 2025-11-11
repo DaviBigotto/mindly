@@ -58,7 +58,7 @@ type AppDataContextValue = {
     storageLimitMb?: number;
     password: string;
   }) => void;
-  login: (input: { email: string; password: string }) => void;
+  login: (input: { email: string; password: string }) => Promise<void>;
   logout: () => void;
 };
 
@@ -376,6 +376,7 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
         firstName,
         lastName,
         profileImageUrl,
+        password, // Include password when syncing
       }),
     })
       .then((response) => {
@@ -426,33 +427,70 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
     persistProfile(null);
   };
 
-  const login: AppDataContextValue["login"] = ({ email, password }) => {
-    const profile = storedProfile || (typeof window !== "undefined"
-      ? ((): StoredProfile | null => {
-          const raw = window.localStorage.getItem(STORAGE_KEY);
-          if (!raw) return null;
-          try {
-            return JSON.parse(raw) as StoredProfile;
-          } catch {
-            return null;
-          }
-        })()
-      : null);
+  const login: AppDataContextValue["login"] = async ({ email, password }) => {
+    try {
+      // Try to login via backend API
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          ...getApiHeaders(email),
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (!profile || profile.email !== email || profile.password !== password) {
-      throw new Error("Credenciais inválidas.");
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Credenciais inválidas");
+      }
+
+      const data = await response.json();
+      const userData = data.user;
+
+      // Authenticate user with data from backend
+      authenticateUser({
+        firstName: userData.firstName || "User",
+        lastName: userData.lastName || "",
+        email: userData.email,
+        profileImageUrl: userData.profileImageUrl || "",
+        isPro: userData.isPro || false,
+        plan: userData.plan || "basic",
+        storageLimitMb: userData.storageLimitMb || 256,
+        password: password, // Store password in localStorage for future logins
+      });
+
+      console.log("User logged in successfully:", userData.email);
+    } catch (error) {
+      console.error("Error during login:", error);
+      // Fallback to localStorage check for backward compatibility
+      const profile = storedProfile || (typeof window !== "undefined"
+        ? ((): StoredProfile | null => {
+            const raw = window.localStorage.getItem(STORAGE_KEY);
+            if (!raw) return null;
+            try {
+              return JSON.parse(raw) as StoredProfile;
+            } catch {
+              return null;
+            }
+          })()
+        : null);
+
+      if (!profile || profile.email !== email || profile.password !== password) {
+        throw new Error("Credenciais inválidas.");
+      }
+
+      authenticateUser({
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        email: profile.email,
+        profileImageUrl: profile.profileImageUrl,
+        isPro: profile.isPro,
+        plan: profile.plan,
+        storageLimitMb: profile.storageLimitMb,
+        password: profile.password,
+      });
     }
-
-    authenticateUser({
-      firstName: profile.firstName,
-      lastName: profile.lastName,
-      email: profile.email,
-      profileImageUrl: profile.profileImageUrl,
-      isPro: profile.isPro,
-      plan: profile.plan,
-      storageLimitMb: profile.storageLimitMb,
-      password: profile.password,
-    });
   };
 
   const profileStats = useMemo<ProfileStats>(() => {

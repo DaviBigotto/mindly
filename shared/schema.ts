@@ -32,6 +32,7 @@ export const users = pgTable("users", {
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
+  password: varchar("password"), // Password hash (optional, for local auth)
   isPro: boolean("is_pro").default(false).notNull(),
   plan: varchar("plan", { length: 50 }).default("basic").notNull(),
   storageLimitMb: integer("storage_limit_mb").default(256).notNull(),
