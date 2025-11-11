@@ -13,7 +13,7 @@ import { useAuth } from "@/hooks/useAuth";
 export default function Signup() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const { authenticate, login } = useAuth();
+  const { authenticate, login, isAuthenticated } = useAuth();
   const [mode, setMode] = useState<"signup" | "login">("signup");
   const [form, setForm] = useState({
     firstName: "",
@@ -23,6 +23,13 @@ export default function Signup() {
     confirmPassword: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Redireciona automaticamente se já estiver autenticado
+  useEffect(() => {
+    if (isAuthenticated) {
+      setLocation("/home");
+    }
+  }, [isAuthenticated, setLocation]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -64,14 +71,14 @@ export default function Signup() {
           title: "Conta criada com sucesso",
           description: `Bem-vindo, ${form.firstName}! Preparamos uma experiência calma para sua jornada Mindly.`,
         });
-        setLocation("/home");
+        // O useEffect vai redirecionar automaticamente quando isAuthenticated for true
       } else {
         await login({ email: form.email, password: form.password });
         toast({
           title: "Login realizado",
           description: "Bom te ver por aqui novamente. Continue sua jornada mindful.",
         });
-        setLocation("/home");
+        // O useEffect vai redirecionar automaticamente quando isAuthenticated for true
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : "Não foi possível concluir a ação.";
