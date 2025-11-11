@@ -52,9 +52,6 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Initialize database (check if tables exist)
-  await initializeDatabase();
-  
   // Setup Replit Auth
   await setupAuth(app);
 
