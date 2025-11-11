@@ -51,7 +51,11 @@ git push -u origin main
    - **Region**: Escolha o mais próximo
    - **Branch**: `main`
    - **Root Directory**: (deixe vazio)
-   - **Build Command**: `npm install && npm run build`
+   - **Build Command**: `NODE_ENV=development npm install && npm run build`
+   
+   ⚠️ **IMPORTANTE:** Use `NODE_ENV=development` para garantir que `vite` e `esbuild` (devDependencies) sejam instalados durante o build!
+   
+   **Alternativa:** `npm install --production=false && npm run build`
    - **Start Command**: `npm start`
    - **Plan**: Free
 

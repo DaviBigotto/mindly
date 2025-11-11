@@ -3,7 +3,7 @@ services:
     name: mindly-app
     env: node
     plan: free
-    buildCommand: npm install && npm run build
+    buildCommand: NODE_ENV=development npm install && npm run build
     startCommand: npm start
     healthCheckPath: /
     # Note: If using Supabase, remove the DATABASE_URL fromDatabase section
