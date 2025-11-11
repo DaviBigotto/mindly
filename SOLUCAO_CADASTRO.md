@@ -4,17 +4,35 @@
 
 As informações de cadastro não estão sendo salvas porque **as tabelas do banco de dados não foram criadas**.
 
-## ✅ Solução Rápida (2 minutos)
+## ✅ Solução Rápida (2 minutos) - GRATUITA
 
-### Passo 1: Abrir Shell no Render
+**💡 Como o Shell do Render é pago, execute localmente!**
 
-1. Acesse: https://dashboard.render.com
-2. Abra seu Web Service `mindly-app`
-3. Clique em **"Shell"** no menu lateral
+### Passo 1: Obter DATABASE_URL
 
-### Passo 2: Criar Tabelas
+1. **Se usar Supabase:**
+   - Acesse: https://app.supabase.com
+   - Settings → Database → Connection string → URI
+   - Copie a URL e **substitua `[YOUR-PASSWORD]` pela senha real**
 
-No Shell, execute:
+2. **Se usar Render PostgreSQL:**
+   - Acesse: https://dashboard.render.com
+   - Abra seu banco → Connections → External Database URL
+   - Copie a URL
+
+### Passo 2: Configurar DATABASE_URL Localmente
+
+```bash
+# Windows (PowerShell)
+$env:DATABASE_URL="postgresql://postgres:SENHA@db.xxx.supabase.co:5432/postgres"
+
+# Linux/Mac
+export DATABASE_URL="postgresql://postgres:SENHA@db.xxx.supabase.co:5432/postgres"
+```
+
+### Passo 3: Executar db:push
+
+Na pasta do projeto, execute:
 
 ```bash
 npm run db:push

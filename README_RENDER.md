@@ -39,9 +39,11 @@ VITE_KIWIFY_OFFER_MINUTES=30
 - Aguarde o build completar
 
 ### 6️⃣ Criar Tabelas no Banco (2 min) ⚠️ OBRIGATÓRIO
-- No Render, vá em "Shell"
+- **💡 Como o Shell do Render é pago, execute localmente:**
+- Configure `DATABASE_URL` localmente
 - Execute: `npm run db:push`
 - **⚠️ SEM ISSO, O CADASTRO NÃO FUNCIONA!**
+- **📝 Veja: `CRIAR_TABELAS_LOCAL.md`**
 
 ### 7️⃣ Configurar Webhook Kiwify (5 min)
 - URL: `https://seu-app.onrender.com/api/webhooks/kiwify`

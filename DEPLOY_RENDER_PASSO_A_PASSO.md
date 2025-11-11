@@ -218,39 +218,39 @@ VITE_KIWIFY_OFFER_MINUTES=30
 
 **⚠️ IMPORTANTE:** Este passo é **OBRIGATÓRIO**! Sem ele, o cadastro não funcionará!
 
-### Opção A: Via Shell do Render (Recomendado)
+**💡 Como o Shell do Render é pago, execute localmente (100% GRATUITO)!**
 
-1. **Abrir Shell:**
-   - No painel do Web Service, clique em **"Shell"**
-   - Isso abre um terminal dentro do servidor
+### Solução: Via Terminal Local (GRATUITA) ⭐
 
-2. **Executar migração:**
+1. **Obter DATABASE_URL:**
+   - **Supabase:** Settings → Database → Connection string → URI
+   - **Render PostgreSQL:** Connections → External Database URL
+   - ⚠️ **Substitua `[YOUR-PASSWORD]` pela senha real**
+
+2. **Configurar DATABASE_URL localmente:**
    ```bash
-   npm run db:push
-   ```
-
-3. **Verificar resultado:**
-   - Você deve ver mensagens como "Tables created successfully"
-   - Se houver erro, verifique se `DATABASE_URL` está correto
-
-### Opção B: Via Terminal Local
-
-1. **Configurar DATABASE_URL localmente:**
-   ```bash
-   # PowerShell
-   $env:DATABASE_URL="postgresql://postgres:senha@db.xxx.supabase.co:5432/postgres"
+   # Windows (PowerShell)
+   $env:DATABASE_URL="postgresql://postgres:SENHA@db.xxx.supabase.co:5432/postgres"
    
    # Linux/Mac
-   export DATABASE_URL="postgresql://postgres:senha@db.xxx.supabase.co:5432/postgres"
+   export DATABASE_URL="postgresql://postgres:SENHA@db.xxx.supabase.co:5432/postgres"
    ```
 
-2. **Executar migração:**
+3. **Executar migração:**
    ```bash
    npm run db:push
    ```
 
-3. **Verificar:**
-   - As tabelas devem ser criadas no banco de dados
+4. **Verificar resultado:**
+   - Você deve ver mensagens como "Tables created successfully"
+   - Verifique no Supabase se as tabelas foram criadas
+
+5. **Testar:**
+   - Acesse sua aplicação
+   - Faça um cadastro
+   - Verifique se o usuário aparece no banco
+
+**📝 Veja o guia completo em: `CRIAR_TABELAS_LOCAL.md`**
 
 ---
 
