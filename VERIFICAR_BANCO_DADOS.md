@@ -13,13 +13,28 @@ As informações de cadastro não estão sendo salvas no banco de dados.
 
 ## ✅ Solução Passo a Passo
 
-### Passo 1: Verificar se as Tabelas Existem
+### Passo 1: Criar Tabelas Localmente (GRATUITA)
 
-No Render, abra o **Shell** e execute:
+**💡 Como o Shell do Render é pago, execute localmente!**
 
-```bash
-npm run db:push
-```
+1. **Obter DATABASE_URL:**
+   - **Supabase:** Settings → Database → Connection string → URI
+   - **Render PostgreSQL:** Connections → External Database URL
+   - ⚠️ **Substitua `[YOUR-PASSWORD]` pela senha real**
+
+2. **Configurar DATABASE_URL localmente:**
+   ```bash
+   # Windows (PowerShell)
+   $env:DATABASE_URL="postgresql://postgres:SENHA@db.xxx.supabase.co:5432/postgres"
+   
+   # Linux/Mac
+   export DATABASE_URL="postgresql://postgres:SENHA@db.xxx.supabase.co:5432/postgres"
+   ```
+
+3. **Executar migração:**
+   ```bash
+   npm run db:push
+   ```
 
 Isso deve criar todas as tabelas necessárias:
 - `users`
@@ -35,7 +50,7 @@ Isso deve criar todas as tabelas necessárias:
 - `kiwify_webhook_logs`
 - `sessions`
 
-### Passo 2: Verificar DATABASE_URL
+### Passo 2: Verificar DATABASE_URL no Render
 
 No Render, vá em **Environment** e verifique:
 
@@ -66,23 +81,11 @@ No Render, vá em **Logs** e procure por:
 
 3. **Mensagens de sucesso:**
    ```
+   User synced from frontend: email@exemplo.com
    User created successfully
-   User updated successfully
    ```
 
-### Passo 4: Testar Conexão com Banco
-
-No Shell do Render, execute:
-
-```bash
-# Verificar se DATABASE_URL está configurado
-echo $DATABASE_URL
-
-# Testar conexão (se tiver psql instalado)
-psql $DATABASE_URL -c "SELECT COUNT(*) FROM users;"
-```
-
-### Passo 5: Verificar se Usuários Estão Sendo Criados
+### Passo 4: Verificar se Usuários Estão Sendo Criados
 
 No Supabase (ou banco de dados), verifique:
 
@@ -93,17 +96,20 @@ No Supabase (ou banco de dados), verifique:
 
 ## 🔧 Comandos Úteis
 
-### Criar Tabelas no Banco
+### Criar Tabelas no Banco (Local)
 
 ```bash
-# No Shell do Render
+# Configurar DATABASE_URL
+$env:DATABASE_URL="postgresql://postgres:SENHA@db.xxx.supabase.co:5432/postgres"
+
+# Executar migração
 npm run db:push
 ```
 
 ### Verificar Tabelas Existentes
 
-```bash
-# No Supabase SQL Editor
+```sql
+-- No Supabase SQL Editor
 SELECT table_name 
 FROM information_schema.tables 
 WHERE table_schema = 'public';
@@ -111,8 +117,8 @@ WHERE table_schema = 'public';
 
 ### Verificar Usuários
 
-```bash
-# No Supabase SQL Editor
+```sql
+-- No Supabase SQL Editor
 SELECT * FROM users;
 ```
 
@@ -120,7 +126,7 @@ SELECT * FROM users;
 
 ### Erro: "relation users does not exist"
 
-**Solução:** Execute `npm run db:push` no Shell do Render
+**Solução:** Execute `npm run db:push` localmente (veja Passo 1)
 
 ### Erro: "password authentication failed"
 
@@ -128,7 +134,10 @@ SELECT * FROM users;
 
 ### Erro: "connect ECONNREFUSED"
 
-**Solução:** Verifique se o DATABASE_URL está correto e se o banco está acessível
+**Solução:** 
+1. Verifique se o DATABASE_URL está correto
+2. Se usar Supabase, use a **"URI"** (não a "Connection pooling")
+3. Se usar Render, use a **"External Database URL"**
 
 ### Usuários não aparecem no banco
 
@@ -140,7 +149,8 @@ SELECT * FROM users;
 ## 📝 Checklist
 
 - [ ] DATABASE_URL configurado no Render
-- [ ] `npm run db:push` executado
+- [ ] DATABASE_URL configurado localmente
+- [ ] `npm run db:push` executado localmente
 - [ ] Tabelas criadas no banco
 - [ ] Logs verificados (sem erros)
 - [ ] Teste de cadastro feito
@@ -148,12 +158,13 @@ SELECT * FROM users;
 
 ## 🎯 Próximos Passos
 
-1. **Execute `npm run db:push` no Shell do Render**
+1. **Execute `npm run db:push` localmente** (veja `CRIAR_TABELAS_LOCAL.md`)
 2. **Verifique os logs do servidor**
 3. **Teste fazer um cadastro**
 4. **Verifique se o usuário aparece no banco**
 
 ---
 
-**Após executar `npm run db:push`, o cadastro deve funcionar!** ✅
+**📝 Veja o guia completo em: `CRIAR_TABELAS_LOCAL.md`**
 
+**Após executar `npm run db:push` localmente, o cadastro deve funcionar!** ✅

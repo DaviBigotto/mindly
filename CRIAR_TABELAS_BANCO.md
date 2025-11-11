@@ -1,33 +1,50 @@
-# 🗄️ Criar Tabelas no Banco de Dados - Render
+# 🗄️ Criar Tabelas no Banco de Dados
 
 ## ❌ Problema
 
 As informações de cadastro não estão sendo salvas porque **as tabelas não foram criadas no banco de dados**.
 
-## ✅ Solução: Executar `npm run db:push`
+## ✅ Solução: Executar `npm run db:push` Localmente (GRATUITA)
 
-### Passo 1: Acessar o Shell do Render
+**💡 Como o Shell do Render é pago, execute localmente apontando para o banco remoto!**
 
-1. **Acesse o painel do Render:**
-   - Vá em: https://dashboard.render.com
-   - Faça login
+### Passo 1: Obter DATABASE_URL
 
-2. **Abra o Web Service:**
-   - Clique no seu serviço `mindly-app`
+#### Se usar Supabase:
+1. Acesse: https://app.supabase.com
+2. Abra seu projeto
+3. Vá em **Settings** → **Database**
+4. Em **Connection string**, selecione **"URI"**
+5. Copie a URL (formato: `postgresql://postgres:[YOUR-PASSWORD]@db.xxx.supabase.co:5432/postgres`)
+6. **Substitua `[YOUR-PASSWORD]` pela senha real**
 
-3. **Abrir Shell:**
-   - No menu lateral, clique em **"Shell"**
-   - Isso abrirá um terminal dentro do servidor
+#### Se usar Render PostgreSQL:
+1. Acesse: https://dashboard.render.com
+2. Abra seu banco de dados PostgreSQL
+3. Vá em **"Connections"**
+4. Copie a **"External Database URL"**
 
-### Passo 2: Executar o Comando
+### Passo 2: Configurar DATABASE_URL Localmente
 
-No Shell do Render, execute:
+#### Windows (PowerShell):
+```powershell
+$env:DATABASE_URL="postgresql://postgres:SENHA@db.xxx.supabase.co:5432/postgres"
+```
+
+#### Linux/Mac:
+```bash
+export DATABASE_URL="postgresql://postgres:SENHA@db.xxx.supabase.co:5432/postgres"
+```
+
+### Passo 3: Executar db:push
+
+Na pasta do projeto, execute:
 
 ```bash
 npm run db:push
 ```
 
-### Passo 3: Verificar Resultado
+### Passo 4: Verificar Resultado
 
 Você deve ver mensagens como:
 
@@ -36,9 +53,7 @@ Você deve ver mensagens como:
 ✓ Migration completed
 ```
 
-Ou algo similar indicando que as tabelas foram criadas.
-
-### Passo 4: Verificar no Banco de Dados
+### Passo 5: Verificar no Banco de Dados
 
 #### Se usar Supabase:
 
@@ -62,13 +77,7 @@ Ou algo similar indicando que as tabelas foram criadas.
      - ✅ `kiwify_webhook_logs`
      - ✅ `sessions`
 
-#### Se usar Render PostgreSQL:
-
-1. **Acesse o Render:**
-   - Vá no seu banco de dados PostgreSQL
-   - Use o **"Connect"** para verificar as tabelas
-
-### Passo 5: Testar Cadastro
+### Passo 6: Testar Cadastro
 
 1. **Acesse sua aplicação:**
    - Vá em: `https://seu-app.onrender.com`
@@ -79,7 +88,7 @@ Ou algo similar indicando que as tabelas foram criadas.
    - Clique em "Quero ser Mindly"
 
 3. **Verificar no banco:**
-   - Volte no Supabase (ou Render PostgreSQL)
+   - Volte no Supabase
    - Vá na tabela `users`
    - Você deve ver o usuário cadastrado!
 
@@ -108,17 +117,18 @@ Ou algo similar indicando que as tabelas foram criadas.
 
 ### Erro: "relation users does not exist"
 
-**Solução:** Execute `npm run db:push` no Shell do Render
+**Solução:** Execute `npm run db:push` localmente (veja Passo 3)
 
 ### Erro: "password authentication failed"
 
-**Solução:** Verifique se o `DATABASE_URL` está correto no Render
+**Solução:** Verifique se a senha no DATABASE_URL está correta
 
 ### Erro: "connect ECONNREFUSED"
 
 **Solução:** 
-1. Verifique se o `DATABASE_URL` está correto
-2. Verifique se o banco está acessível (Supabase permite conexões externas)
+1. Verifique se o DATABASE_URL está correto
+2. Se usar Supabase, use a **"URI"** (não a "Connection pooling")
+3. Se usar Render, use a **"External Database URL"**
 
 ### Tabelas não aparecem
 
@@ -132,19 +142,16 @@ Ou algo similar indicando que as tabelas foram criadas.
 ### Verificar se DATABASE_URL está configurado:
 
 ```bash
+# Windows (PowerShell)
+echo $env:DATABASE_URL
+
+# Linux/Mac
 echo $DATABASE_URL
 ```
 
-### Testar conexão (se tiver psql):
+### Ver todas as tabelas no Supabase:
 
-```bash
-psql $DATABASE_URL -c "SELECT COUNT(*) FROM users;"
-```
-
-### Ver todas as tabelas:
-
-```bash
-# No Supabase SQL Editor
+```sql
 SELECT table_name 
 FROM information_schema.tables 
 WHERE table_schema = 'public';
@@ -152,10 +159,12 @@ WHERE table_schema = 'public';
 
 ## ✅ Checklist
 
-- [ ] Shell do Render aberto
+- [ ] DATABASE_URL copiado do Supabase/Render
+- [ ] Senha substituída corretamente
+- [ ] DATABASE_URL configurado localmente
 - [ ] `npm run db:push` executado
 - [ ] Mensagem de sucesso apareceu
-- [ ] Tabelas verificadas no banco (Supabase ou Render)
+- [ ] Tabelas verificadas no banco (Supabase)
 - [ ] Teste de cadastro feito
 - [ ] Usuário aparece na tabela `users`
 
@@ -168,5 +177,6 @@ WHERE table_schema = 'public';
 
 ---
 
-**Após executar `npm run db:push`, o cadastro deve funcionar perfeitamente!** ✅
+**📝 Veja o guia completo em: `CRIAR_TABELAS_LOCAL.md`**
 
+**Após executar `npm run db:push` localmente, o cadastro deve funcionar perfeitamente!** ✅
